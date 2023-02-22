@@ -26,7 +26,7 @@ class State:
         self.heading *= self.dThetaDs
         self.vel[0] = np.real(self.heading) * dx
         self.vel[1] = np.imag(self.heading) * dx
-        self.pos += self.vel * self.dt
+        self.pos += (self.vel + wind(self.pos)) * self.dt
         self.zVelLast = self.vel[2]
 
         t.append(self.time)
@@ -66,6 +66,26 @@ class State:
         return (calculation*intermediate)/3.281
         # returns in metric again
 
+    def setHeadingRad(self, heading):
+        self.heading = np.exp(1j * heading)
+
+    def getHeadingRad(self):
+        return np.angle(self.heading)
+
+    def setDThetaDtRad(self, dThetaDt):
+        self.dThetaDs = np.exp(1j * (self.dt * dThetaDt))
+
+    def getDThetaDtRad(self):
+        return np.angle(self.dThetaDs) / self.dt
+
+# TODO: proper wind fn
+def wind(pos):
+    return [-1, -1, 0]
+
+# TODO: impl
+def setTurningRadius(rocket, radius):
+    rocket.dThetaDt = np.exp(1j * velocity / radius)
+
 
 rocket = State()
 rocket.pos = np.array((0,0,15000),dtype='float64')
@@ -76,16 +96,17 @@ x = []
 y = []
 z = []
 
-rocket.dThetaDs = np.exp(1j * 0.01)
+rocket.dThetaDs = np.exp(1j * (rocket.dt * 0.05))
 
 while rocket.pos[2] > 0:
     x.append(rocket.pos[0])
     y.append(rocket.pos[1])
     z.append(rocket.pos[2])
         
-    #fallRate = -rocket.rateOfDescent(rocket.pos[2])
-    #rocket.vel[2] = fallRate
-    rocket.vel[2] = -1000
+    rocket.vel[2] = -rocket.rateOfDescent(rocket.pos[2])
+    print(rocket.getHeadingRad() * 180 / 3.14)
+    #rocket.vel[2] = -100
+    #print(rocket.vel[2])
     
     rocket.update()
     
