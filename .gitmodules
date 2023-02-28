@@ -1,4 +1,4 @@
 [submodule "Guidance-Algorithm-Prototype"]
-	path = Guidance-Algorithm-Prototype
+	path = Alg
 	url = https://github.com/Case-Rocket-Team/Guidance-Algorithm-Prototype
 	branch = simulation-api
